@@ -3,39 +3,53 @@
 #include <mythril/kernel.hpp>
 #include <sapphire/sapphire_core.hpp>
 
-#include "dummy_component.hpp"
+// Sandbox-only dummy component
+#include <sandbox/dummy_component.hpp>
 
 int main()
 {
-    // Create the kernel (authoritative time source)
+    // Kernel: authoritative time source
     mythril::Kernel kernel;
 
-    // Create the Sapphire core hosted inside the kernel
+    // Core: authoritative machine
     sapphire::SapphireCore core(kernel);
 
-    // Create a sandbox-only dummy component
+    // Dummy hardware component (sandbox only)
     sandbox::DummyComponent dummy;
 
-    // Register the dummy with the kernel
-    kernel.register_component(&dummy);
+    std::cout << "=== Positive lifecycle tests ===\n\n";
 
-    // Initial state (pre-execution)
+
     std::cout << "Initial state:\n";
-    std::cout << "  tick = " << kernel.tick() << "\n";
+    std::cout << "  core state = " << static_cast<int>(core.state()) << "\n";
+    std::cout << "  kernel tick = " << kernel.tick() << "\n";
     std::cout << "  dummy step count = " << dummy.step_count() << "\n\n";
 
-    // Start the kernel lifecycle
-    kernel.start();
+    // ---- Construction phase ----
+    core.add_component(&dummy);
 
-    std::cout << "After start (no stepping):\n";
-    std::cout << "  tick = " << kernel.tick() << "\n";
+    // Freeze topology
+    core.freeze();
+
+    std::cout << "After freeze:\n";
+    std::cout << "  core state = " << static_cast<int>(core.state()) << "\n";
+    std::cout << "  kernel tick = " << kernel.tick() << "\n";
     std::cout << "  dummy step count = " << dummy.step_count() << "\n\n";
 
-    // Advance one authorized step via the core
+    // Start execution
+    core.start();
+
+    std::cout << "After start:\n";
+    std::cout << "  core state = " << static_cast<int>(core.state()) << "\n";
+    std::cout << "  kernel tick = " << kernel.tick() << "\n";
+    std::cout << "  dummy step count = " << dummy.step_count() << "\n\n";
+
+    // ---- Running phase ----
     core.step();
 
     std::cout << "After one core.step():\n";
-    std::cout << "  tick = " << kernel.tick() << "\n";
+    std::cout << "  core state = " << static_cast<int>(core.state()) << "\n";
+    std::cout << "  kernel tick = " << kernel.tick() << "\n";
     std::cout << "  dummy step count = " << dummy.step_count() << "\n\n";
 
     return 0;

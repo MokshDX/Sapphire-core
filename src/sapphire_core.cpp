@@ -2,19 +2,57 @@
 
 namespace sapphire {
 
-SapphireCore::SapphireCore(mythril::Kernel& kernel)
-    : kernel_(kernel)
-{
-}
+    SapphireCore::SapphireCore(mythril::Kernel& kernel)
+        : kernel_(kernel),
+        state_(State::Constructing)
+    {
+    }
 
-void SapphireCore::step()
-{
-    kernel_.step();
-}
+    void SapphireCore::add_component(mythril::Component* component)
+    {
+        if (state_ != State::Constructing) {
+            return;
+        }
 
-mythril::Kernel& SapphireCore::kernel()
-{
-    return kernel_;
-}
+        components_.push_back(component);
+    }
+
+    void SapphireCore::freeze()
+    {
+        if (state_ != State::Constructing) {
+            return;
+        }
+
+        // Register all components with the kernel in fixed order
+        for (mythril::Component* component : components_) {
+            kernel_.register_component(component);
+        }
+
+        state_ = State::Frozen;
+    }
+
+    void SapphireCore::start()
+    {
+        if (state_ != State::Frozen) {
+            return;
+        }
+
+        kernel_.start();
+        state_ = State::Running;
+    }
+
+    void SapphireCore::step()
+    {
+        if (state_ != State::Running) {
+            return;
+        }
+
+        kernel_.step();
+    }
+
+    SapphireCore::State SapphireCore::state() const
+    {
+        return state_;
+    }
 
 } // namespace sapphire
