@@ -50,6 +50,21 @@ namespace sapphire {
         kernel_.step();
     }
 
+    void SapphireCore::enforce_bus_timing(const BusAccessResult& result)
+    {
+        if (state_ != State::Running)
+        {
+            return;
+        }
+
+        //Explicit,auditable timing enforcement
+        for (std::uint64_t i = 0; i < result.timing.time_cost; ++i)
+        {
+            kernel_.step();
+        }
+        
+    }
+
     SapphireCore::State SapphireCore::state() const
     {
         return state_;

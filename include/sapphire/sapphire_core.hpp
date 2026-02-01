@@ -4,55 +4,57 @@
 
 #include <mythril/kernel.hpp>
 #include <mythril/component.hpp>
-
+#include <sapphire/bus_types.hpp>
 namespace sapphire {
 
-class SapphireCore final {
+    class SapphireCore final {
 
-    public:
-        // Lifecycle states of the core
-        enum class State {
-            Constructing,
-            Frozen,
-            Running
-        };
+        public:
+            // Lifecycle states of the core
+            enum class State {
+                Constructing,
+                Frozen,
+                Running
+            };
 
-        // Construct a core bound to a kernel.
-        // Enters Constructing state.
-        explicit SapphireCore(mythril::Kernel& kernel);
+            // Construct a core bound to a kernel.
+            // Enters Constructing state.
+            explicit SapphireCore(mythril::Kernel& kernel);
 
-        // ---- Construction phase ----
+            // ---- Construction phase ----
 
-        // Register a hardware component in execution order.
-        // Allowed only in Constructing state.
-        void add_component(mythril::Component* component);
+            // Register a hardware component in execution order.
+            // Allowed only in Constructing state.
+            void add_component(mythril::Component* component);
 
-        // Freeze the machine topology.
-        // Transitions Constructing -> Frozen.
-        void freeze();
+            // Freeze the machine topology.
+            // Transitions Constructing -> Frozen.
+            void freeze();
 
-        // ---- Execution phase ----
+            // ---- Execution phase ----
 
-        // Start execution.
-        // Transitions Frozen -> Running.
-        void start();
+            // Start execution.
+            // Transitions Frozen -> Running.
+            void start();
 
-        // Advance the machine by exactly one kernel tick.
-        // Allowed only in Running state.
-        void step();
+            // Advance the machine by exactly one kernel tick.
+            // Allowed only in Running state.
+            void step();
 
-        // ---- Introspection ----
+            //Explicit timing enforcement
+            void enforce_bus_timing(const BusAccessResult& result);
 
-        // Return current lifecycle state.
-        State state() const;
+            // ---- Introspection ----
 
-    private:
-        mythril::Kernel& kernel_;
-        State state_;
+            // Return current lifecycle state.
+            State state() const;
 
-        // Ordered list of hardware components owned by the core.
-        std::vector<mythril::Component*> components_;
-};
+        private:
+            mythril::Kernel& kernel_;
+            State state_;
+
+            // Ordered list of hardware components owned by the core.
+            std::vector<mythril::Component*> components_;
+    };
 
 } // namespace sapphire
-
