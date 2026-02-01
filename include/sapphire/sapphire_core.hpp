@@ -5,6 +5,7 @@
 #include <mythril/kernel.hpp>
 #include <mythril/component.hpp>
 #include <sapphire/bus_types.hpp>
+#include <sapphire/timing_accumulator.hpp>
 namespace sapphire {
 
     class SapphireCore final {
@@ -42,7 +43,7 @@ namespace sapphire {
             void step();
 
             //Explicit timing enforcement
-            void enforce_bus_timing(const BusAccessResult& result);
+            void record_bus_timing(const BusAccessResult& result);
 
             // ---- Introspection ----
 
@@ -55,6 +56,8 @@ namespace sapphire {
 
             // Ordered list of hardware components owned by the core.
             std::vector<mythril::Component*> components_;
+
+            TimingAccumulator timing_;
     };
 
 } // namespace sapphire

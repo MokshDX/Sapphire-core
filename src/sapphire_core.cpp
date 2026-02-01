@@ -47,21 +47,27 @@ namespace sapphire {
             return;
         }
 
+        //1. Advance exactly one scheduling tick
         kernel_.step();
+
+        //2. Enforce accumulated hardware After the tick
+        const std::uint64_t accumulated_time = timing_.total_cost();
+
+        for(std::uint64_t i=0; i < accumulated_time; ++i){
+            kernel_.step();
+        }
+        //3. Explicity clear timing boundry
+        timing_.clear();
     }
 
-    void SapphireCore::enforce_bus_timing(const BusAccessResult& result)
+    void SapphireCore::record_bus_timing(const BusAccessResult& result)
     {
         if (state_ != State::Running)
         {
             return;
         }
 
-        //Explicit,auditable timing enforcement
-        for (std::uint64_t i = 0; i < result.timing.time_cost; ++i)
-        {
-            kernel_.step();
-        }
+        timing_.record(result);
         
     }
 
