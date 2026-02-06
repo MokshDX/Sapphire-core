@@ -1,7 +1,6 @@
 #pragma once
 
 #include <cstdint>
-#include <optional>
 
 namespace sapphire {
 
@@ -31,8 +30,9 @@ struct BusAccessResult {
     BusTiming timing;
     BusAccessFlags flags;
 
-    // Present only for reads
-    std::optional<std::uint32_t> value;
+    // Always present for reads
+    //Open-bus,floating or garbage is modeled via flags + value
+    std::uint32_t value = 0;
 };
 
 } // namespace sapphire

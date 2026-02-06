@@ -20,7 +20,7 @@ public:
         result.kind = BusAccessKind::Write;
         result.timing.time_cost = 1; // dummy abstract cost
         result.flags = {};
-        result.value.reset();
+        result.value = 0;
         return result;
     }
 };

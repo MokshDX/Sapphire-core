@@ -13,8 +13,7 @@ int main() {
 
     assert(result.timing.time_cost == 5);
     assert(result.flags.open_bus);
-    assert(result.value.has_value());
-    assert(result.value.value() == 0xAB);
+    assert(result.value == 0xAB);
 
     return 0;
 }
